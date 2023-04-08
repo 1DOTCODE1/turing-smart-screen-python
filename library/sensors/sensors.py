@@ -33,6 +33,13 @@ class Cpu(ABC):
     @abstractmethod
     def frequency() -> float:
         pass
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    @abstractmethod
+    def frequencyCores(cores: Tuple[int, ...]) -> float: 
+        pass
 
     @staticmethod
     @abstractmethod
@@ -42,6 +49,13 @@ class Cpu(ABC):
     @staticmethod
     @abstractmethod
     def is_temperature_available() -> bool:
+        pass
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    @abstractmethod
+    def temperatureCores(cores: Tuple[int, ...]) -> float:
         pass
 
     @staticmethod
@@ -66,6 +80,16 @@ class Memory(ABC):
     @staticmethod
     @abstractmethod
     def swap_percent() -> float:
+        pass
+        
+    @staticmethod
+    @abstractmethod
+    def swap_used() -> int: # In bytes
+        pass
+        
+    @staticmethod
+    @abstractmethod
+    def swap_free() -> int: # In bytes
         pass
 
     @staticmethod

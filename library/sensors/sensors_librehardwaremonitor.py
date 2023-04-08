@@ -26,6 +26,7 @@ import os
 import sys
 from statistics import mean
 from typing import Tuple
+import re
 
 import clr  # Clr is from pythonnet package. Do not install clr package
 import psutil
@@ -117,6 +118,31 @@ class Cpu(sensors.Cpu):
         return math.nan
 
     @staticmethod
+    def frequencyCores(cores: Tuple[int, ...]) -> float:
+        frequencies = []
+        cpu = get_hw_and_update(Hardware.HardwareType.Cpu)
+        for sensor in cpu.Sensors:
+            if sensor.SensorType == Hardware.SensorType.Clock:
+                # Keep only real core clocks, ignore effective core clocks
+                if "Core #" in str(sensor.Name) and "Effective" not in str(sensor.Name):
+                    name = str(sensor.Name)
+                    coreNum = re.sub(r'[^0-9]', '', name)
+                
+                    if coreNum != '':
+                        core = int(coreNum)
+                        
+                        #is the cores we are looking for?
+                        if core in cores and sensor.Value:
+                            frequencies.append(float(sensor.Value))
+
+        if frequencies:
+            # Take mean of all core clock as "CPU clock" (as it is done in Windows Task Manager Performance tab)
+            return mean(frequencies)
+        else:
+            # Frequencies reading is not supported on this CPU
+            return math.nan
+
+    @staticmethod
     def frequency() -> float:
         frequencies = []
         cpu = get_hw_and_update(Hardware.HardwareType.Cpu)
@@ -148,10 +174,39 @@ class Cpu(sensors.Cpu):
                     return True
 
         return False
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    def temperatureCores(cores: Tuple[int, ...]) -> float:
+        cpu = get_hw_and_update(Hardware.HardwareType.Cpu)
+        temperatures = []
 
+        # It must be the mean of the received cores
+        for sensor in cpu.Sensors:
+            if sensor.SensorType == Hardware.SensorType.Temperature and str(sensor.Name).startswith("CPU Core #"):
+                name = str(sensor.Name)
+                coreNum = re.sub(r'[^0-9]', '', name)
+                
+                if coreNum != '' and name.replace('CPU Core #', '') == coreNum: #no TJmax entries
+                    core = int(coreNum)
+                    
+                    if core in cores:
+                        temperatures.append(float(sensor.Value))
+        
+        if temperatures:
+            return mean(temperatures)
+
+        return math.nan
+        
     @staticmethod
     def temperature() -> float:
         cpu = get_hw_and_update(Hardware.HardwareType.Cpu)
+        
+        # By default, the CPU Package temperature should be used! This is the most correct to check
+        for sensor in cpu.Sensors:
+            if sensor.SensorType == Hardware.SensorType.Temperature and str(sensor.Name).startswith("CPU Package"):
+                return float(sensor.Value)
         # By default, the average temperature of all CPU cores will be used
         for sensor in cpu.Sensors:
             if sensor.SensorType == Hardware.SensorType.Temperature and str(sensor.Name).startswith("Core Average"):
@@ -247,7 +302,46 @@ class Memory(sensors.Memory):
         swap_total = swap_used + swap_available
 
         return swap_used / swap_total * 100.0
+        
+    @staticmethod
+    def swap_used() -> int:  # In bytes
+        memory = get_hw_and_update(Hardware.HardwareType.Memory)
 
+        virtual_mem_used = math.nan
+        mem_used = math.nan
+
+        # Get virtual / physical memory stats
+        for sensor in memory.Sensors:
+            if sensor.SensorType == Hardware.SensorType.Data and str(sensor.Name).startswith("Virtual Memory Used"):
+                virtual_mem_used = int(sensor.Value)
+            elif sensor.SensorType == Hardware.SensorType.Data and str(sensor.Name).startswith("Memory Used"):
+                mem_used = int(sensor.Value)
+
+        # Compute swap stats from virtual / physical memory stats
+        swap_used = virtual_mem_used - mem_used
+
+        return int(swap_used * 1000000000.0)
+        
+    @staticmethod
+    def swap_free() -> int:  # In bytes
+        memory = get_hw_and_update(Hardware.HardwareType.Memory)
+
+        virtual_mem_available = math.nan
+        mem_available = math.nan
+
+        # Get virtual / physical memory stats
+        for sensor in memory.Sensors:
+            if sensor.SensorType == Hardware.SensorType.Data and str(sensor.Name).startswith(
+                    "Virtual Memory Available"):
+                virtual_mem_available = int(sensor.Value)
+            elif sensor.SensorType == Hardware.SensorType.Data and str(sensor.Name).startswith("Memory Available"):
+                mem_available = int(sensor.Value)
+
+        # Compute swap stats from virtual / physical memory stats
+        swap_available = virtual_mem_available - mem_available
+
+        return int(swap_available * 1000000000.0)
+        
     @staticmethod
     def virtual_percent() -> float:
         memory = get_hw_and_update(Hardware.HardwareType.Memory)

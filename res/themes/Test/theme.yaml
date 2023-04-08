@@ -1,0 +1,288 @@
+---
+display:
+  DISPLAY_ORIENTATION: landscape
+  DISPLAY_RGB_LED: 16, 223, 239
+
+static_images:
+  BACKGROUND:
+    PATH: background.png
+    X: 0
+    Y: 0
+    WIDTH: 480
+    HEIGHT: 320
+static_text:
+  CPU_LOAD:
+    TEXT: "CPU Load"
+    X: 200
+    Y: 115
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 18
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  CPU_LOAD_GRAPH:
+    TEXT: "CPU Load Graph"
+    X: 320
+    Y: 100
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  P_CORE:
+    TEXT: "P-Cores Clock Mean"
+    X: 70
+    Y: 40
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  P_CORE_TEMP:
+    TEXT: " -> Temperature"
+    X: 180
+    Y: 40
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  E_CORE:
+    TEXT: "E-Cores Clock Mean"
+    X: 270
+    Y: 240
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  E_CORE_TEMP:
+    TEXT: " -> Temperature"
+    X: 380
+    Y: 240
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  CPU_PACKAGE:
+    TEXT: "CPU Package Temp"
+    X: 40
+    Y: 185
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  CPU_PACKAGE:
+    TEXT: "CPU Package Temp"
+    X: 40
+    Y: 185
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+  CPU_FREQ:
+    TEXT: "All CPU Mean Clock"
+    X: 150
+    Y: 230
+    FONT: roboto/Roboto-Bold.ttf
+    FONT_SIZE: 12
+    FONT_COLOR: 16, 223, 239
+    BACKGROUND_IMAGE: background.png
+STATS:
+  CPU:
+    PERCENTAGE:
+      INTERVAL: 1
+      GRAPH_CIRC:
+        SHOW: True
+        X: 329
+        Y: 117
+        R: 38
+        MIN_VALUE: 0
+        MAX_VALUE: 100
+        BAR_COLOR: 
+          LOW: 
+            VALUE: 0
+            COLOR: 0, 255, 0
+          MED: 
+            VALUE: 50
+            COLOR: 255, 255, 0
+          HIGH: 
+            VALUE: 75
+            COLOR: 255, 0, 0
+        BAR_OUTLINE: False
+        TEXT: True
+        FONT: generale-mono/GeneraleMonoA.ttf
+        BAR_OUTLINE: 2
+        THICKNESS: 5
+        FONT_SIZE: 16
+        FONT_COLOR: 
+          LOW: 
+            VALUE: 0
+            COLOR: 0, 255, 0
+          MED: 
+            VALUE: 50
+            COLOR: 255, 255, 0
+          HIGH: 
+            VALUE: 75
+            COLOR: 255, 0, 0
+        BACKGROUND_IMAGE: background.png
+      TEXT:
+        SHOW: True
+        SHOW_UNIT: True
+        X: 206
+        Y: 144
+        FONT: generale-mono/GeneraleMonoA.ttf
+        FONT_SIZE: 22
+        FONT_COLOR: 
+          LOW: 
+            VALUE: 0
+            COLOR: 0, 255, 0
+          MED: 
+            VALUE: 50
+            COLOR: 255, 255, 0
+          HIGH: 
+            VALUE: 75
+            COLOR: 255, 0, 0
+        BACKGROUND_IMAGE: background.png
+    FREQUENCY:
+      INTERVAL: 1
+      TEXT:
+        SHOW: True
+        SHOW_UNIT: True
+        X: 160
+        Y: 250
+        FONT: generale-mono/GeneraleMonoA.ttf
+        FONT_SIZE: 16
+        FONT_COLOR: 128, 255, 255
+        BACKGROUND_IMAGE: background.png
+      CORES:
+        C0:
+          CORE_LIST: 1, 2, 3, 4, 5, 6, 7, 8
+          GRAPH_CIRC:
+            SHOW: True
+            X: 100
+            Y: 60
+            R: 38
+            MIN_VALUE: 0
+            MAX_VALUE: 6.0
+            BAR_COLOR: 
+              LOW: 
+                VALUE: 0
+                COLOR: 0, 255, 0
+              MED: 
+                VALUE: 4.0
+                COLOR: 255, 255, 0
+              HIGH: 
+                VALUE: 5.0
+                COLOR: 255, 0, 0
+            BAR_OUTLINE: True
+            TEXT: True
+            FONT: generale-mono/GeneraleMonoA.ttf
+            BAR_OUTLINE: 2
+            THICKNESS: 5
+            FONT_SIZE: 10
+            FONT_COLOR: 
+              LOW: 
+                VALUE: 0
+                COLOR: 0, 255, 0
+              MED: 
+                VALUE: 4.0
+                COLOR: 255, 255, 0
+              HIGH: 
+                VALUE: 5.0
+                COLOR: 255, 0, 0
+            BACKGROUND_IMAGE: background.png
+        C1:
+          CORE_LIST: 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+          TEXT:
+            SHOW: True
+            SHOW_UNIT: True
+            X: 300
+            Y: 260
+            FONT: generale-mono/GeneraleMonoA.ttf
+            FONT_SIZE: 16
+            FONT_COLOR: 
+              LOW: 
+                VALUE: 0
+                COLOR: 0, 255, 0
+              MED: 
+                VALUE: 4.0
+                COLOR: 255, 255, 0
+              HIGH: 
+                VALUE: 5.0
+                COLOR: 255, 0, 0
+            BACKGROUND_IMAGE: background.png
+    TEMPERATURE:
+      INTERVAL: 1
+      CORES:
+        C0:
+          CORE_LIST: 1, 2, 3, 4, 5, 6, 7, 8
+          TEXT:
+            SHOW: True
+            SHOW_UNIT: True
+            X: 200
+            Y: 60
+            FONT: generale-mono/GeneraleMonoA.ttf
+            FONT_SIZE: 16
+            FONT_COLOR: 
+              LOW: 
+                VALUE: 0
+                COLOR: 0, 255, 0
+              MED: 
+                VALUE: 60
+                COLOR: 255, 255, 0
+              HIGH: 
+                VALUE: 75
+                COLOR: 255, 0, 0
+                BACKGROUND_IMAGE: background.png
+            BACKGROUND_IMAGE: background.png
+        C1:
+          CORE_LIST: 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+          TEXT:
+            SHOW: True
+            SHOW_UNIT: True
+            X: 400
+            Y: 260
+            FONT: generale-mono/GeneraleMonoA.ttf
+            FONT_SIZE: 16
+            FONT_COLOR: 
+              LOW: 
+                VALUE: 0
+                COLOR: 0, 255, 0
+              MED: 
+                VALUE: 60
+                COLOR: 255, 255, 0
+              HIGH: 
+                VALUE: 75
+                COLOR: 255, 0, 0
+            BACKGROUND_IMAGE: background.png
+      GRAPH_CIRC:
+        SHOW: True
+        X: 50
+        Y: 200
+        R: 38
+        MIN_VALUE: 0
+        MAX_VALUE: 100
+        BAR_COLOR: 
+          LOW: 
+            VALUE: 0
+            COLOR: 0, 255, 0
+          MED: 
+            VALUE: 50
+            COLOR: 255, 255, 0
+          HIGH: 
+            VALUE: 75
+            COLOR: 255, 0, 0
+        BAR_OUTLINE: False
+        TEXT: True
+        FONT: generale-mono/GeneraleMonoA.ttf
+        BAR_OUTLINE: 0
+        THICKNESS: 5
+        FONT_SIZE: 16
+        FONT_COLOR: 
+          LOW: 
+            VALUE: 0
+            COLOR: 0, 255, 0
+          MED: 
+            VALUE: 50
+            COLOR: 255, 255, 0
+          HIGH: 
+            VALUE: 75
+            COLOR: 255, 0, 0
+        BACKGROUND_IMAGE: background.png
+

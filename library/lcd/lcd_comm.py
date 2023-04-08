@@ -225,6 +225,11 @@ class LcdComm(ABC):
 
     def DisplayProgressBar(self, x: int, y: int, width: int, height: int, min_value: int = 0, max_value: int = 100,
                            value: int = 50,
+                           font: str = 'arial.ttf',
+                           font_size: int = 10,
+                           stroke_width: int = 0,
+                           font_color: Tuple[int, int, int] = (0, 0, 0),
+                           text: str = '',
                            bar_color: Tuple[int, int, int] = (0, 0, 0),
                            bar_outline: bool = True,
                            background_color: Tuple[int, int, int] = (255, 255, 255),
@@ -269,5 +274,92 @@ class LcdComm(ABC):
         if bar_outline:
             # Draw outline
             draw.rectangle([0, 0, width - 1, height - 1], fill=None, outline=bar_color)
+            
+        if text != '':
+            actFont = ImageFont.truetype("./res/fonts/" + font, font_size)
+            if isinstance(font_color, str):
+                font_color = tuple(map(int, font_color.split(', ')))
+            draw.text([width / 2, height / 2], str(text), fill=font_color, font=actFont, anchor='mm', spacing=0, align=None, direction=None, features=None, language=None, stroke_width=stroke_width, stroke_fill=None, embedded_color=False)
 
         self.DisplayPILImage(bar_image, x, y)
+
+    def DisplayRoundProgressBar(self, x: int, y: int, r: int, min_value: int = 0, max_value: int = 100,
+                           thick: int = 10,
+                           value: int = 50,
+                           start_angle: int = 0,
+                           font: str = 'arial.ttf',
+                           font_size: int = 10,
+                           stroke_width: int = 0,
+                           font_color: Tuple[int, int, int] = (0, 0, 0),
+                           text: str = '',
+                           bar_color: Tuple[int, int, int] = (0, 0, 0),
+                           bar_outline: int = 0,
+                           background_color: Tuple[int, int, int] = (255, 255, 255),
+                           background_image: str = None):
+        # Generate a progress bar and display it
+        # Provide the background image path to display progress bar with transparent background
+        
+        if r == 0:
+            return
+
+        if isinstance(bar_color, str):
+            bar_color = tuple(map(int, bar_color.split(', ')))
+
+        if isinstance(background_color, str):
+            background_color = tuple(map(int, background_color.split(', ')))
+
+        assert x <= self.get_width(), 'Progress bar X coordinate must be <= display width'
+        assert y <= self.get_height(), 'Progress bar Y coordinate must be <= display height'
+        assert x + r*2 <= self.get_width(), 'Progress bar width exceeds display width'
+        assert y + r*2 <= self.get_height(), 'Progress bar height exceeds display height'
+
+        # Don't let the set value exceed our min or max value, this is bad :)
+        if value < min_value:
+            value = min_value
+        elif max_value < value:
+            value = max_value
+
+        assert min_value <= value <= max_value, 'Progress bar value shall be between min and max'
+        
+        if background_image is None:
+            # A bitmap is created with solid background
+            bar_image = Image.new('RGB', (r*2, r*2), background_color)
+        else:
+            # A bitmap is created from provided background image
+            bar_image = Image.open(background_image)
+
+            # Crop bitmap to keep only the progress bar background
+            bar_image = bar_image.crop(box=(x, y, x + r*2, y + r*2))
+        
+        scale = 3
+        radi = r * scale
+        thickness = thick * scale
+        border = bar_outline * scale
+        margin = 3 * scale
+        circ_image = Image.new('RGBA', (radi*2, radi*2), tuple([0,0,0,0]) )
+            
+        # Draw progress bar
+        circle_value = value / (max_value - min_value) * 360
+        draw = ImageDraw.Draw(circ_image)
+
+        # Fill Arc
+        draw.arc([margin, margin, (radi * 2)-margin, (radi * 2)-margin],
+                 start = -90 + start_angle, end = -90 + start_angle + circle_value, fill=bar_color, width=thickness+2)
+
+        if bar_outline > 0:
+            # Draw outline
+            draw.arc([margin, margin, (radi * 2)-margin, (radi * 2)-margin],
+                     start = -90 + start_angle, end = -90 + start_angle + 360, fill=bar_color, width=border)
+            draw.arc([ thickness+margin, thickness+margin, (radi * 2)-thickness-margin, (radi * 2)-thickness-margin],
+                     start = -90 + start_angle, end = -90 + start_angle + 360, fill=bar_color, width=border)
+         
+        if text != '':
+            actFont = ImageFont.truetype("./res/fonts/" + font, font_size*scale)
+            if isinstance(font_color, str):
+                font_color = tuple(map(int, font_color.split(', ')))
+            draw.text([radi-2, radi+2], str(text), fill=font_color, font=actFont, anchor='mm', spacing=0, align=None, direction=None, features=None, language=None, stroke_width=stroke_width, stroke_fill=None, embedded_color=False)
+
+        circ_image = circ_image.resize((r*2, r*2), resample=Image.ANTIALIAS)
+        
+        
+        self.DisplayPILImage(Image.alpha_composite(bar_image, circ_image), x, y)

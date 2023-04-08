@@ -29,7 +29,13 @@ class Cpu(sensors.Cpu):
     @staticmethod
     def percentage(interval: float) -> float:
         return random.uniform(0, 100)
-
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    def frequencyCores(cores: Tuple[int, ...]) -> float: 
+        return random.uniform(800, 3400)
+        
     @staticmethod
     def frequency() -> float:
         return random.uniform(800, 3400)
@@ -41,7 +47,13 @@ class Cpu(sensors.Cpu):
     @staticmethod
     def is_temperature_available() -> bool:
         return True
-
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    def temperatureCores(cores: Tuple[int, ...]) -> float:
+        return random.uniform(30, 90)
+        
     @staticmethod
     def temperature() -> float:
         return random.uniform(30, 90)
@@ -61,6 +73,14 @@ class Memory(sensors.Memory):
     @staticmethod
     def swap_percent() -> float:
         return random.uniform(0, 100)
+
+    @staticmethod
+    def swap_free() -> int:  # In bytes
+        return random.randint(300000000, 16000000000)
+        
+    @staticmethod
+    def swap_used() -> int:  # In bytes
+        return random.randint(300000000, 16000000000)
 
     @staticmethod
     def virtual_percent() -> float:

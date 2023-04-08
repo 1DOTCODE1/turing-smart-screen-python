@@ -61,6 +61,14 @@ class Cpu(sensors.Cpu):
     def percentage(interval: float) -> float:
         return psutil.cpu_percent(interval=interval)
 
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    @abstractmethod
+    def frequencyCores(cores: Tuple[int, ...]) -> float: 
+        logger.warning("frequencyCores not available for psutil.")
+        return math.nan
+
     @staticmethod
     def frequency() -> float:
         return psutil.cpu_freq().current
@@ -80,6 +88,13 @@ class Cpu(sensors.Cpu):
         except AttributeError:
             # sensors_temperatures may not be available at all
             return False
+
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    def temperatureCores(cores: Tuple[int, ...]) -> float:
+        logger.warning("frequencyCores not available for psutil.")
+        return math.nan
 
     @staticmethod
     def temperature() -> float:
@@ -239,6 +254,14 @@ class Memory(sensors.Memory):
     @staticmethod
     def swap_percent() -> float:
         return psutil.swap_memory().percent
+        
+    @staticmethod
+    def swap_free() -> int: # In bytes
+        return psutil.swap_memory().free
+        
+    @staticmethod
+    def swap_used() -> int: # In bytes
+        return psutil.swap_memory().used
 
     @staticmethod
     def virtual_percent() -> float:

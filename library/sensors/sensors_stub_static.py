@@ -39,7 +39,13 @@ class Cpu(sensors.Cpu):
     @staticmethod
     def percentage(interval: float) -> float:
         return PERCENTAGE_SENSOR_VALUE
-
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    def frequencyCores(cores: Tuple[int, ...]) -> float: 
+        return CPU_FREQ_MHZ
+        
     @staticmethod
     def frequency() -> float:
         return CPU_FREQ_MHZ
@@ -51,7 +57,13 @@ class Cpu(sensors.Cpu):
     @staticmethod
     def is_temperature_available() -> bool:
         return True
-
+        
+    #allow the show of frequency per cor group, for example for Intel p-cores/e-cores
+    #or AMD chiplet design, cores per chiplet
+    @staticmethod
+    def temperatureCores(cores: Tuple[int, ...]) -> float:
+        return TEMPERATURE_SENSOR_VALUE
+        
     @staticmethod
     def temperature() -> float:
         return TEMPERATURE_SENSOR_VALUE
@@ -72,6 +84,14 @@ class Memory(sensors.Memory):
     @staticmethod
     def swap_percent() -> float:
         return PERCENTAGE_SENSOR_VALUE
+        
+    @staticmethod
+    def swap_free() -> int:  # In bytes
+        return int(MEMORY_TOTAL_SIZE_GB / 100 * PERCENTAGE_SENSOR_VALUE) * 1000000000
+        
+    @staticmethod
+    def swap_used() -> int:  # In bytes
+        return int(MEMORY_TOTAL_SIZE_GB / 100 * PERCENTAGE_SENSOR_VALUE) * 1000000000
 
     @staticmethod
     def virtual_percent() -> float:
