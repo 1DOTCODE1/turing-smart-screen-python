@@ -35,6 +35,7 @@ import library.config as config
 from library.display import display
 from library.log import logger
 
+#Class to allow diferent colors for objects based on value and MIN, MED, MAX
 class ProgressBarColors:
     __low: tuple[float, tuple[int, int, int]] = None
     __med: tuple[float, tuple[int, int, int]] = None
@@ -46,23 +47,34 @@ class ProgressBarColors:
                  high: tuple[float, tuple[int, int, int]] = None ):
         self.__low = low
         
-        if med is not None and high is not None and \
-           isinstance(med[0], float) and isinstance(high[0], float) and \
-           low[0] < med[0] and med[0] < high[0]:
+        #In case the MED is defined and greater then MIN
+        if med is not None and (isinstance(med[0], float) or isinstance(med[0], int)) and self.__low[0] < med[0]:
             self.__med = med
+        
+        #In case the MAX is defined and greater then MED
+        #and cannot have MED without MED
+        if self.__med is not None and high is not None and (isinstance(high[0], float) or isinstance(high[0], int)) and self.__med[0] < high[0]:
             self.__high = high
     
+    #Obtain color based on value
     def getColor(self, value: float ):
-        if self.__med is None and self.__high is None:
+        #In case there is no MED
+        if self.__med is None:
             return self.__low[1]
         
+        #if the value is smaller then MED then it is MIN
         if value < self.__med[0]:
             return self.__low[1]
+            
+        #In case there is no MAX then it is MED
+        if self.__high is None:
+            return self.__med[1]
         
+        #if the value is smaller then MAX then it is MED
         if value < self.__high[0]:
             return self.__med[1]
             
-        
+        #otherwise it is MAX
         return self.__high[1]
 
 ETH_CARD = config.CONFIG_DATA["config"]["ETH"]
@@ -123,15 +135,25 @@ class CPU:
         cpu_freq = f'{cpu_real_freq:.2f}'
         GUI.show(hw = 'CPU', hw_type = 'FREQUENCY', value = cpu_real_freq, value_text = cpu_freq, unit = ' GHz' )
         
+        #Frequency per core group defined in the theme - MAX 10 groups
         if coresConfig := config.THEME_DATA['STATS']['CPU']['FREQUENCY'].get('CORES',False):  
+            #Start at group 0
             groupid = 0
+            
+            #go to max of 10 groups
             while groupid < 10:
+                #create group name
                 gname = 'C' + str(groupid)
+                
+                #check if it is defined in the theme
                 if coresConfigGroup := coresConfig.get(gname, False):
+                    #validate that there is a core list
                     if coreList := coresConfigGroup.get("CORE_LIST", False):
+                        #convert core list to tuple
                         if isinstance(coreList, str):
                             coreList = tuple(map(int, coreList.split(', ')))
                         
+                        #ontain mean of the cpu group
                         cpu_real_freq = sensors.Cpu.frequencyCores(coreList) / 1000
                         cpu_freq = f'{cpu_real_freq:.2f}'
                         GUI.show(hw = 'CPU', hw_type = 'FREQUENCY', hw_subtype = 'CORES', hw_subsubtype = gname, value = cpu_real_freq, value_text = cpu_freq, unit = ' GHz' )
@@ -163,17 +185,25 @@ class CPU:
         cpu_temp = f"{int(cpu_temp_value):>3}"
         GUI.show(hw = 'CPU', hw_type = 'TEMPERATURE', value = cpu_temp_value, value_text = cpu_temp, unit = '°C' )
         
-        
+        #Temperature per core group defined in the theme - MAX 10 groups
         if coresConfig := config.THEME_DATA['STATS']['CPU']['TEMPERATURE'].get('CORES',False):  
+            #Start at group 0
             groupid = 0
+            
+            #go to max of 10 groups
             while groupid < 10:
+                #create group name
                 gname = 'C' + str(groupid)
+                
+                #check if it is defined in the theme
                 if coresConfigGroup := coresConfig.get(gname, False):
+                    #validate that there is a core list
                     if coreList := coresConfigGroup.get("CORE_LIST", False):
+                        #convert core list to tuple
                         if isinstance(coreList, str):
                             coreList = tuple(map(int, coreList.split(', ')))
                         
-                        
+                        #ontain mean of the cpu group
                         cpu_temp_value = sensors.Cpu.temperatureCores(coreList)
                         if cpu_temp_value != math.nan:
                             cpu_temp = f"{int(cpu_temp_value):>3}"
@@ -270,10 +300,13 @@ class Disk:
         
         total_text = f"{int((free + used) / 1000000000):>5}"
         
+        #Used
         GUI.show(hw = 'DISK', hw_type = 'USED', value = used_perc, value_text = used_text, unit = ' G' )
         
+        #Free
         GUI.show(hw = 'DISK', hw_type = 'FREE', value = used_perc, value_text = free_text, unit = ' G' )
         
+        #Total
         GUI.show(hw = 'DISK', hw_type = 'TOTAL', value = used_perc, value_text = total_text, unit = ' G' )
         
 
@@ -346,12 +379,14 @@ class GUI:
             
         hwConfig = config.THEME_DATA['STATS'][hw][hw_type]
         
+        #Obtain sub type of HW - Example HW = NET | HW_TYPE = WLO | HW_SUBTYPE = UPLOAD
         if hw_subtype is not None:
             if hwConfig.get(hw_subtype, False):
                 hwConfig = hwConfig[hw_subtype]
             else:
                 return
         
+        #Obtain sub type of the sub type of HW - Example HW = CPU | HW_TYPE = FREQUENCY | HW_SUBTYPE = CORES | HW_SUBSUBTYPE = C1
         if hw_subsubtype is not None:
             if hwConfig.get(hw_subsubtype, False):
                 hwConfig = hwConfig[hw_subsubtype]
@@ -359,6 +394,7 @@ class GUI:
                 return
 
         #Graphs
+        #Bar Graph
         if graphConfig := hwConfig.get("GRAPH", False):
             
             if graphConfig.get("SHOW", False):
@@ -399,6 +435,7 @@ class GUI:
                                                    graphConfig.get("BACKGROUND_IMAGE", None))
                 )
                 
+        #Circular Graph
         if graphCircConfig := hwConfig.get("GRAPH_CIRC", False):
             
             if graphCircConfig.get("SHOW", False):
@@ -470,7 +507,9 @@ class GUI:
                     background_color=textConfig.get("BACKGROUND_COLOR", (255, 255, 255)),
                     background_image=get_full_path(config.THEME_DATA['PATH'], textConfig.get("BACKGROUND_IMAGE", None))
                 )
-                
+        
+        
+        #Percentage Text - for backwards compatibility
         if textPercConfig := hwConfig.get("PERCENT_TEXT", False):
         
             if textPercConfig.get("SHOW", False):

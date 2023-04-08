@@ -93,7 +93,7 @@ class Cpu(sensors.Cpu):
     #or AMD chiplet design, cores per chiplet
     @staticmethod
     def temperatureCores(cores: Tuple[int, ...]) -> float:
-        logger.warning("frequencyCores not available for psutil.")
+        logger.warning("temperatureCores not available for psutil.")
         return math.nan
 
     @staticmethod
