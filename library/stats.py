@@ -136,7 +136,7 @@ class CPU:
         GUI.show(hw = 'CPU', hw_type = 'FREQUENCY', value = cpu_real_freq, value_text = cpu_freq, unit = ' GHz' )
         
         #Frequency per core group defined in the theme - MAX 10 groups
-        if coresConfig := config.THEME_DATA['STATS']['CPU']['FREQUENCY'].get('CORES',False):  
+        if cores_config := config.THEME_DATA['STATS']['CPU']['FREQUENCY'].get('CORES',False):  
             #Start at group 0
             groupid = 0
             
@@ -146,15 +146,15 @@ class CPU:
                 gname = 'C' + str(groupid)
                 
                 #check if it is defined in the theme
-                if coresConfigGroup := coresConfig.get(gname, False):
+                if cores_configGroup := cores_config.get(gname, False):
                     #validate that there is a core list
-                    if coreList := coresConfigGroup.get("CORE_LIST", False):
+                    if core_list := cores_configGroup.get("CORE_LIST", False):
                         #convert core list to tuple
-                        if isinstance(coreList, str):
-                            coreList = tuple(map(int, coreList.split(', ')))
+                        if isinstance(core_list, str):
+                            core_list = tuple(map(int, core_list.split(', ')))
                         
                         #ontain mean of the cpu group
-                        cpu_real_freq = sensors.Cpu.frequencyCores(coreList) / 1000
+                        cpu_real_freq = sensors.Cpu.frequencyCores(core_list) / 1000
                         cpu_freq = f'{cpu_real_freq:.2f}'
                         GUI.show(hw = 'CPU', hw_type = 'FREQUENCY', hw_subtype = 'CORES', hw_subsubtype = gname, value = cpu_real_freq, value_text = cpu_freq, unit = ' GHz' )
                 
@@ -186,7 +186,7 @@ class CPU:
         GUI.show(hw = 'CPU', hw_type = 'TEMPERATURE', value = cpu_temp_value, value_text = cpu_temp, unit = '°C' )
         
         #Temperature per core group defined in the theme - MAX 10 groups
-        if coresConfig := config.THEME_DATA['STATS']['CPU']['TEMPERATURE'].get('CORES',False):  
+        if cores_config := config.THEME_DATA['STATS']['CPU']['TEMPERATURE'].get('CORES',False):  
             #Start at group 0
             groupid = 0
             
@@ -196,15 +196,15 @@ class CPU:
                 gname = 'C' + str(groupid)
                 
                 #check if it is defined in the theme
-                if coresConfigGroup := coresConfig.get(gname, False):
+                if cores_configGroup := cores_config.get(gname, False):
                     #validate that there is a core list
-                    if coreList := coresConfigGroup.get("CORE_LIST", False):
+                    if core_list := cores_configGroup.get("CORE_LIST", False):
                         #convert core list to tuple
-                        if isinstance(coreList, str):
-                            coreList = tuple(map(int, coreList.split(', ')))
+                        if isinstance(core_list, str):
+                            core_list = tuple(map(int, core_list.split(', ')))
                         
                         #ontain mean of the cpu group
-                        cpu_temp_value = sensors.Cpu.temperatureCores(coreList)
+                        cpu_temp_value = sensors.Cpu.temperatureCores(core_list)
                         if cpu_temp_value != math.nan:
                             cpu_temp = f"{int(cpu_temp_value):>3}"
                             GUI.show(hw = 'CPU', hw_type = 'TEMPERATURE', hw_subtype = 'CORES', hw_subsubtype = gname, value = cpu_temp_value, value_text = cpu_temp, unit = '°C' )
@@ -377,203 +377,202 @@ class GUI:
     @staticmethod
     def show(hw: str, hw_type: str, hw_subtype: str = None, hw_subsubtype: str = None, value = None, value_text: str = '', unit: str = '' ):
             
-        hwConfig = config.THEME_DATA['STATS'][hw][hw_type]
+        hw_config = config.THEME_DATA['STATS'][hw][hw_type]
         
         #Obtain sub type of HW - Example HW = NET | HW_TYPE = WLO | HW_SUBTYPE = UPLOAD
         if hw_subtype is not None:
-            if hwConfig.get(hw_subtype, False):
-                hwConfig = hwConfig[hw_subtype]
+            if hw_config.get(hw_subtype, False):
+                hw_config = hw_config[hw_subtype]
             else:
                 return
         
         #Obtain sub type of the sub type of HW - Example HW = CPU | HW_TYPE = FREQUENCY | HW_SUBTYPE = CORES | HW_SUBSUBTYPE = C1
         if hw_subsubtype is not None:
-            if hwConfig.get(hw_subsubtype, False):
-                hwConfig = hwConfig[hw_subsubtype]
+            if hw_config.get(hw_subsubtype, False):
+                hw_config = hw_config[hw_subsubtype]
             else:
                 return
 
         #Graphs
         #Bar Graph
-        if graphConfig := hwConfig.get("GRAPH", False):
+        if graph_config := hw_config.get("GRAPH", False):
             
-            if graphConfig.get("SHOW", False):
+            if graph_config.get("SHOW", False):
                 if value is None:
                     return
                                  
-                if graphConfig.get("TEXT", False):
+                if graph_config.get("TEXT", False):
                     textGraph = value_text
                     
-                    if graphConfig.get("SHOW_UNIT", True):
+                    if graph_config.get("SHOW_UNIT", True):
                         textGraph += unit
                 else:
                     textGraph = ''
                     
                 #Graph Color
-                backColor = GUI.createProgressColor(graphConfig.get("BAR_COLOR", None))
+                back_color = GUI.createProgressColor(graph_config.get("BAR_COLOR", None))
                 
                 #Graph Text Color                                
-                textColor = GUI.createProgressColor(graphConfig.get("FONT_COLOR", None))
+                text_color = GUI.createProgressColor(graph_config.get("FONT_COLOR", None))
                     
                 display.lcd.DisplayProgressBar(
-                    x=graphConfig.get("X", 0),
-                    y=graphConfig.get("Y", 0),
-                    width=graphConfig.get("WIDTH", 0),
-                    height=graphConfig.get("HEIGHT", 0),
+                    x=graph_config.get("X", 0),
+                    y=graph_config.get("Y", 0),
+                    width=graph_config.get("WIDTH", 0),
+                    height=graph_config.get("HEIGHT", 0),
                     value=int(value),
-                    font=graphConfig.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
-                    font_size=graphConfig.get("FONT_SIZE", 10),
-                    stroke_width=graphConfig.get("STROKE_WIDTH", 10),
-                    font_color=textColor.getColor(int(value)),
+                    font=graph_config.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
+                    font_size=graph_config.get("FONT_SIZE", 10),
+                    stroke_width=graph_config.get("STROKE_WIDTH", 10),
+                    font_color=text_color.getColor(int(value)),
                     text=textGraph,
-                    min_value=graphConfig.get("MIN_VALUE", 0),
-                    max_value=graphConfig.get("MAX_VALUE", 100),
-                    bar_color=backColor.getColor(int(value)),
-                    bar_outline=graphConfig.get("BAR_OUTLINE", False),
-                    background_color=graphConfig.get("BACKGROUND_COLOR", (255, 255, 255)),
+                    min_value=graph_config.get("MIN_VALUE", 0),
+                    max_value=graph_config.get("MAX_VALUE", 100),
+                    bar_color=back_color.getColor(int(value)),
+                    bar_outline=graph_config.get("BAR_OUTLINE", False),
+                    background_color=graph_config.get("BACKGROUND_COLOR", (255, 255, 255)),
                     background_image=get_full_path(config.THEME_DATA['PATH'],
-                                                   graphConfig.get("BACKGROUND_IMAGE", None))
+                                                   graph_config.get("BACKGROUND_IMAGE", None))
                 )
                 
         #Circular Graph
-        if graphCircConfig := hwConfig.get("GRAPH_CIRC", False):
+        if graph_circle_config := hw_config.get("GRAPH_CIRC", False):
             
-            if graphCircConfig.get("SHOW", False):
+            if graph_circle_config.get("SHOW", False):
                 if value is None:
                     return
                     
-                if graphCircConfig.get("TEXT", False):
+                if graph_circle_config.get("TEXT", False):
                     textGraph = value_text
                     
-                    if graphCircConfig.get("SHOW_UNIT", True):
+                    if graph_circle_config.get("SHOW_UNIT", True):
                         textGraph += unit
                 else:
                     textGraph = ''
                     
                 #Graph Color
-                backColor = GUI.createProgressColor(graphCircConfig.get("BAR_COLOR", None))
+                back_color = GUI.createProgressColor(graph_circle_config.get("BAR_COLOR", None))
                 
                 #Graph Text Color                                
-                textColor = GUI.createProgressColor(graphCircConfig.get("FONT_COLOR", None))
+                text_color = GUI.createProgressColor(graph_circle_config.get("FONT_COLOR", None))
                     
                 display.lcd.DisplayRoundProgressBar(
-                    x=graphCircConfig.get("X", 0),
-                    y=graphCircConfig.get("Y", 0),
-                    r=graphCircConfig.get("R", 0),
-                    min_value=graphCircConfig.get("MIN_VALUE", 0),
-                    max_value=graphCircConfig.get("MAX_VALUE", 100),
-                    thick=graphCircConfig.get("THICKNESS", 0),
+                    x=graph_circle_config.get("X", 0),
+                    y=graph_circle_config.get("Y", 0),
+                    r=graph_circle_config.get("R", 0),
+                    min_value=graph_circle_config.get("MIN_VALUE", 0),
+                    max_value=graph_circle_config.get("MAX_VALUE", 100),
+                    thick=graph_circle_config.get("THICKNESS", 0),
                     value=int(value),
-                    start_angle=graphCircConfig.get("START_ANGLE", 0),
-                    font=graphCircConfig.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
-                    font_size=graphCircConfig.get("FONT_SIZE", 10),
-                    stroke_width=graphCircConfig.get("STROKE_WIDTH", 0),
-                    font_color=textColor.getColor(int(value)),
+                    start_angle=graph_circle_config.get("START_ANGLE", 0),
+                    font=graph_circle_config.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
+                    font_size=graph_circle_config.get("FONT_SIZE", 10),
+                    stroke_width=graph_circle_config.get("STROKE_WIDTH", 0),
+                    font_color=text_color.getColor(int(value)),
                     text=textGraph,
-                    bar_color=backColor.getColor(int(value)),
-                    bar_outline=graphCircConfig.get("BAR_OUTLINE", 0),
-                    background_color=graphCircConfig.get("BACKGROUND_COLOR", (255, 255, 255)),
+                    bar_color=back_color.getColor(int(value)),
+                    bar_outline=graph_circle_config.get("BAR_OUTLINE", 0),
+                    background_color=graph_circle_config.get("BACKGROUND_COLOR", (255, 255, 255)),
                     background_image=get_full_path(config.THEME_DATA['PATH'],
-                                                   graphCircConfig.get("BACKGROUND_IMAGE", None))
+                                                   graph_circle_config.get("BACKGROUND_IMAGE", None))
                 )
         
         #Texts
-        if textConfig := hwConfig.get("TEXT", False):
+        if text_config := hw_config.get("TEXT", False):
         
-            if textConfig.get("SHOW", False):
+            if text_config.get("SHOW", False):
                 
                 if value_text != '':                
                     load_text = str(value_text)
                 else:
                     load_text = str(value)
-                if textConfig.get("SHOW_UNIT", False):
+                if text_config.get("SHOW_UNIT", False):
                     load_text += unit
                     
                 #Text Color                                
-                textColor = GUI.createProgressColor(textConfig.get("FONT_COLOR", None))
+                text_color = GUI.createProgressColor(text_config.get("FONT_COLOR", None))
                 
                 if value is None:
-                    textColor = textColor.getColor(0)
+                    text_color = text_color.getColor(0)
                 else:
-                    textColor = textColor.getColor(value)
+                    text_color = text_color.getColor(value)
 
                 display.lcd.DisplayText(
-                   text=load_text,
-                    x=textConfig.get("X", 0),
-                    y=textConfig.get("Y", 0),
-                    font=textConfig.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
-                    font_size=textConfig.get("FONT_SIZE", 10),
-                    font_color=textColor,
-                    background_color=textConfig.get("BACKGROUND_COLOR", (255, 255, 255)),
-                    background_image=get_full_path(config.THEME_DATA['PATH'], textConfig.get("BACKGROUND_IMAGE", None))
+                    text=load_text,
+                    x=text_config.get("X", 0),
+                    y=text_config.get("Y", 0),
+                    font=text_config.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
+                    font_size=text_config.get("FONT_SIZE", 10),
+                    font_color=text_color,
+                    background_color=text_config.get("BACKGROUND_COLOR", (255, 255, 255)),
+                    background_image=get_full_path(config.THEME_DATA['PATH'], text_config.get("BACKGROUND_IMAGE", None))
                 )
-        
-        
+                
         #Percentage Text - for backwards compatibility
-        if textPercConfig := hwConfig.get("PERCENT_TEXT", False):
+        if text_perc_config := hw_config.get("PERCENT_TEXT", False):
         
-            if textPercConfig.get("SHOW", False):
+            if text_perc_config.get("SHOW", False):
                 
                 load_text = f"{int(value):>3}"
-                if textPercConfig.get("SHOW_UNIT", False):
+                if text_perc_config.get("SHOW_UNIT", False):
                     load_text += "%"
 
                 #Text Color                                
-                textColor = GUI.createProgressColor(textPercConfig.get("FONT_COLOR", None))
+                text_color = GUI.createProgressColor(text_perc_config.get("FONT_COLOR", None))
                 
                 if value is None:
-                    textColor = textColor.getColor(0)
+                    text_color = text_color.getColor(0)
                 else:
-                    textColor = textColor.getColor(value)
+                    text_color = text_color.getColor(value)
                 
                 display.lcd.DisplayText(
-                   text=load_text,
-                    x=textPercConfig.get("X", 0),
-                    y=textPercConfig.get("Y", 0),
-                    font=textPercConfig.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
-                    font_size=textPercConfig.get("FONT_SIZE", 10),
-                    font_color=textColor,
-                    background_color=textPercConfig.get("BACKGROUND_COLOR", (255, 255, 255)),
-                    background_image=get_full_path(config.THEME_DATA['PATH'], textPercConfig.get("BACKGROUND_IMAGE", None))
+                    text=load_text,
+                    x=text_perc_config.get("X", 0),
+                    y=text_perc_config.get("Y", 0),
+                    font=text_perc_config.get("FONT", "roboto-mono/RobotoMono-Regular.ttf"),
+                    font_size=text_perc_config.get("FONT_SIZE", 10),
+                    font_color=text_color,
+                    background_color=text_perc_config.get("BACKGROUND_COLOR", (255, 255, 255)),
+                    background_image=get_full_path(config.THEME_DATA['PATH'], text_perc_config.get("BACKGROUND_IMAGE", None))
                 )
               
     @staticmethod  
-    def createProgressColor(yamlEntry) -> ProgressBarColors:
+    def createProgressColor(yaml_entry) -> ProgressBarColors:
         #Only one color is defined, backwards compatibility
-        if isinstance(yamlEntry, str):
-            lowColor = (0, tuple(map(int, yamlEntry.split(', '))))
-            medColor = None
-            highColor = None
+        if isinstance(yaml_entry, str):
+            low_color = (0, tuple(map(int, yaml_entry.split(', '))))
+            med_color = None
+            high_color = None
         #None is defined, set black
-        elif yamlEntry is None or yamlEntry.get("LOW", None) is None:
-            lowColor = (0, (0, 0, 0))
-            medColor = None
-            highColor = None
+        elif yaml_entry is None or yaml_entry.get("LOW", None) is None:
+            low_color = (0, (0, 0, 0))
+            med_color = None
+            high_color = None
         else:
             #Obtain LOW color, or use default
-            lowColor = yamlEntry.get("LOW", None)
-            lowColorVal = lowColor.get("VALUE", 0)
-            lowColorTup = lowColor.get("COLOR", "0, 0, 0")
-            lowColor = (lowColorVal, tuple(map(int, lowColorTup.split(', '))))
+            low_color = yaml_entry.get("LOW", None)
+            low_color_value = low_color.get("VALUE", 0)
+            low_color_tuple = low_color.get("COLOR", "0, 0, 0")
+            low_color = (low_color_value, tuple(map(int, low_color_tuple.split(', '))))
             
             #In case there is a MED defined, use it
-            medColor = yamlEntry.get("MED", None)
-            if medColor is not None:
-                medColorVal = medColor.get("VALUE", None)
-                medColorTup = medColor.get("COLOR", "0, 0, 0")
-                medColor = (medColorVal, tuple(map(int, medColorTup.split(', '))))
+            med_color = yaml_entry.get("MED", None)
+            if med_color is not None:
+                med_color_value = med_color.get("VALUE", None)
+                med_color_tuple = med_color.get("COLOR", "0, 0, 0")
+                med_color = (med_color_value, tuple(map(int, med_color_tuple.split(', '))))
             else:
-                medColor = None
+                med_color = None
             
             #In case there is a HIGH defined, use it
-            highColor = yamlEntry.get("HIGH", None)
-            if highColor is not None:
-                highColorVal = highColor.get("VALUE", None)
-                highColorTup = highColor.get("COLOR", "0, 0, 0")
-                highColor = (highColorVal, tuple(map(int, highColorTup.split(', '))))
+            high_color = yaml_entry.get("HIGH", None)
+            if high_color is not None:
+                high_color_value = high_color.get("VALUE", None)
+                high_color_tuple = high_color.get("COLOR", "0, 0, 0")
+                high_color = (high_color_value, tuple(map(int, high_color_tuple.split(', '))))
             else:
-                highColor = None
+                high_color = None
             
         #Create Progress Bar Color Class Instance
-        return ProgressBarColors(low = lowColor, med = medColor, high = highColor)
+        return ProgressBarColors(low = low_color, med = med_color, high = high_color)
         

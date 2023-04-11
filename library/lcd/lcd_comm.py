@@ -275,27 +275,33 @@ class LcdComm(ABC):
             # Draw outline
             draw.rectangle([0, 0, width - 1, height - 1], fill=None, outline=bar_color)
             
+        #add Text?
         if text != '':
-            actFont = ImageFont.truetype("./res/fonts/" + font, font_size)
+            #obtain font and text size
+            act_font = ImageFont.truetype("./res/fonts/" + font, font_size)
+            
+            #Is there a font color in text?
             if isinstance(font_color, str):
                 font_color = tuple(map(int, font_color.split(', ')))
-            draw.text([width / 2, height / 2], str(text), fill=font_color, font=actFont, anchor='mm', spacing=0, align=None, direction=None, features=None, language=None, stroke_width=stroke_width, stroke_fill=None, embedded_color=False)
+                
+            #draw the text in the middle of the graph
+            draw.text([width / 2, height / 2], str(text), fill=font_color, font=act_font, anchor='mm', spacing=0, align=None, direction=None, features=None, language=None, stroke_width=stroke_width, stroke_fill=None, embedded_color=False)
 
         self.DisplayPILImage(bar_image, x, y)
 
     def DisplayRoundProgressBar(self, x: int, y: int, r: int, min_value: int = 0, max_value: int = 100,
-                           thick: int = 10,
-                           value: int = 50,
-                           start_angle: int = 0,
-                           font: str = 'arial.ttf',
-                           font_size: int = 10,
-                           stroke_width: int = 0,
-                           font_color: Tuple[int, int, int] = (0, 0, 0),
-                           text: str = '',
-                           bar_color: Tuple[int, int, int] = (0, 0, 0),
-                           bar_outline: int = 0,
-                           background_color: Tuple[int, int, int] = (255, 255, 255),
-                           background_image: str = None):
+                                thick: int = 10,
+                                value: int = 50,
+                                start_angle: int = 0,
+                                font: str = 'arial.ttf',
+                                font_size: int = 10,
+                                stroke_width: int = 0,
+                                font_color: Tuple[int, int, int] = (0, 0, 0),
+                                text: str = '',
+                                bar_color: Tuple[int, int, int] = (0, 0, 0),
+                                bar_outline: int = 0,
+                                background_color: Tuple[int, int, int] = (255, 255, 255),
+                                background_image: str = None):
         # Generate a progress bar and display it
         # Provide the background image path to display progress bar with transparent background
         
@@ -331,11 +337,15 @@ class LcdComm(ABC):
             # Crop bitmap to keep only the progress bar background
             bar_image = bar_image.crop(box=(x, y, x + r*2, y + r*2))
         
-        scale = 3
+        #create scale for the image creation, since afterwards it will be scaled down
+        #to apply the atialias
+        scale = 3 #the circle will be generated at this scale and the reduced to its actual dimentions, 3x Scale
         radi = r * scale
         thickness = thick * scale
         border = bar_outline * scale
         margin = 3 * scale
+        
+        #create graph image, allowing opacity
         circ_image = Image.new('RGBA', (radi*2, radi*2), tuple([0,0,0,0]) )
             
         # Draw progress bar
@@ -343,23 +353,35 @@ class LcdComm(ABC):
         draw = ImageDraw.Draw(circ_image)
 
         # Fill Arc
-        draw.arc([margin, margin, (radi * 2)-margin, (radi * 2)-margin],
-                 start = -90 + start_angle, end = -90 + start_angle + circle_value, fill=bar_color, width=thickness+2)
+        draw.arc([ margin, margin, (radi * 2) - margin, (radi * 2) - margin ],
+                   start = -90 + start_angle, end = -90 + start_angle + circle_value, fill=bar_color, width=thickness+2)
 
+        # Draw outline?
         if bar_outline > 0:
-            # Draw outline
-            draw.arc([margin, margin, (radi * 2)-margin, (radi * 2)-margin],
-                     start = -90 + start_angle, end = -90 + start_angle + 360, fill=bar_color, width=border)
-            draw.arc([ thickness+margin, thickness+margin, (radi * 2)-thickness-margin, (radi * 2)-thickness-margin],
-                     start = -90 + start_angle, end = -90 + start_angle + 360, fill=bar_color, width=border)
-         
+            #Outer outline
+            draw.arc([ margin, margin, (radi * 2) - margin, (radi * 2) - margin ],
+                       start = -90 + start_angle, end = -90 + start_angle + 360, fill=bar_color, width=border)
+            
+            #Inner Outline
+            draw.arc([ thickness + margin, thickness + margin, (radi * 2) - thickness - margin, (radi * 2) - thickness - margin ],
+                       start = -90 + start_angle, end = -90 + start_angle + 360, fill=bar_color, width=border)
+        
+        #add Text?
         if text != '':
-            actFont = ImageFont.truetype("./res/fonts/" + font, font_size*scale)
+            #obtain font and text size
+            act_font = ImageFont.truetype("./res/fonts/" + font, font_size * scale)
+            
+            #Is there a font color in text?
             if isinstance(font_color, str):
                 font_color = tuple(map(int, font_color.split(', ')))
-            draw.text([radi-2, radi+2], str(text), fill=font_color, font=actFont, anchor='mm', spacing=0, align=None, direction=None, features=None, language=None, stroke_width=stroke_width, stroke_fill=None, embedded_color=False)
+            
+            #draw the text in the middle of the graph
+            draw.text([radi-2, radi+2], str(text), fill=font_color, font=act_font, anchor='mm', spacing=0, align=None, direction=None, features=None, language=None, stroke_width=stroke_width, stroke_fill=None, embedded_color=False)
 
+                                                                            
+        
+        #resize the graph while applying the antialias
         circ_image = circ_image.resize((r*2, r*2), resample=Image.ANTIALIAS)
         
-        
+        #Merge the background image with the graph
         self.DisplayPILImage(Image.alpha_composite(bar_image, circ_image), x, y)
