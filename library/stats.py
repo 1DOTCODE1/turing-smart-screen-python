@@ -146,9 +146,9 @@ class CPU:
                 gname = 'C' + str(groupid)
                 
                 #check if it is defined in the theme
-                if cores_configGroup := cores_config.get(gname, False):
+                if cores_config_group := cores_config.get(gname, False):
                     #validate that there is a core list
-                    if core_list := cores_configGroup.get("CORE_LIST", False):
+                    if core_list := cores_config_group.get("CORE_LIST", False):
                         #convert core list to tuple
                         if isinstance(core_list, str):
                             core_list = tuple(map(int, core_list.split(', ')))
@@ -196,9 +196,9 @@ class CPU:
                 gname = 'C' + str(groupid)
                 
                 #check if it is defined in the theme
-                if cores_configGroup := cores_config.get(gname, False):
+                if cores_config_group := cores_config.get(gname, False):
                     #validate that there is a core list
-                    if core_list := cores_configGroup.get("CORE_LIST", False):
+                    if core_list := cores_config_group.get("CORE_LIST", False):
                         #convert core list to tuple
                         if isinstance(core_list, str):
                             core_list = tuple(map(int, core_list.split(', ')))

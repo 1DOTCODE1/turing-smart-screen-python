@@ -126,10 +126,10 @@ class Cpu(sensors.Cpu):
                 # Keep only real core clocks, ignore effective core clocks
                 if "Core #" in str(sensor.Name) and "Effective" not in str(sensor.Name):
                     name = str(sensor.Name)
-                    coreNum = re.sub(r'[^0-9]', '', name)
+                    core_num = re.sub(r'[^0-9]', '', name)
                 
-                    if coreNum != '':
-                        core = int(coreNum)
+                    if core_num != '':
+                        core = int(core_num)
                         
                         #is the cores we are looking for?
                         if core in cores and sensor.Value:
@@ -186,10 +186,10 @@ class Cpu(sensors.Cpu):
         for sensor in cpu.Sensors:
             if sensor.SensorType == Hardware.SensorType.Temperature and str(sensor.Name).startswith("CPU Core #"):
                 name = str(sensor.Name)
-                coreNum = re.sub(r'[^0-9]', '', name)
+                core_num = re.sub(r'[^0-9]', '', name)
                 
-                if coreNum != '' and name.replace('CPU Core #', '') == coreNum: #no TJmax entries
-                    core = int(coreNum)
+                if core_num != '' and name.replace('CPU Core #', '') == core_num: #no TJmax entries
+                    core = int(core_num)
                     
                     if core in cores:
                         temperatures.append(float(sensor.Value))
